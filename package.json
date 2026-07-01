@@ -1,0 +1,28 @@
+{
+  "name": "duux-fan-card",
+  "version": "1.0.0",
+  "description": "A full-featured custom Lovelace card for Duux (Whisper Flex) fans in Home Assistant",
+  "type": "module",
+  "main": "dist/duux-fan-card.js",
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c --watch",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["home-assistant", "lovelace", "custom-card", "duux", "fan", "hacs"],
+  "license": "MIT",
+  "dependencies": {
+    "custom-card-helpers": "^1.9.0",
+    "lit": "^3.1.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.9.6",
+    "@rollup/plugin-terser": "^0.4.4",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3"
+  }
+}
