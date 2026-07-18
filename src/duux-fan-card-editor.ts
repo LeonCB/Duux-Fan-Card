@@ -19,6 +19,7 @@ const SCHEMA = [
       { name: "show_vertical_oscillation", selector: { boolean: {} } },
       { name: "show_timer", selector: { boolean: {} } },
       { name: "show_background", selector: { boolean: {} } },
+      { name: "show_box_shadow", selector: { boolean: {} } },
     ],
   },
 ];
@@ -35,6 +36,7 @@ const LABELS: Record<string, string> = {
   show_vertical_oscillation: "Toon verticale oscillatie",
   show_timer: "Toon timer",
   show_background: "Toon achtergrond",
+  show_box_shadow: "Toon schaduw",
 };
 
 @customElement("duux-fan-card-editor")

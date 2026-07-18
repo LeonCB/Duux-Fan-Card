@@ -9,6 +9,7 @@ export const DEFAULT_DUUX_FAN_CARD_CONFIG: Partial<DuuxFanCardConfig> = {
   show_vertical_oscillation: true,
   show_timer: true,
   show_background: true,
+  show_box_shadow: true,
 };
 
 export interface DuuxFanCardConfig extends LovelaceCardConfig {
@@ -34,6 +35,7 @@ export interface DuuxFanCardConfig extends LovelaceCardConfig {
 
   // Styling options (the "opmaakmogelijkheden binnen de kaart zelf")
   show_background?: boolean;        // whether the card has a background at all
+  show_box_shadow?: boolean;        // whether the card shows its drop shadow
   accent_color?: string;            // active/highlight color
   background?: string;              // card background (used only when show_background is true)
   text_color?: string;             // primary text color

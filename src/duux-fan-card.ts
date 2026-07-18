@@ -362,9 +362,12 @@ export class DuuxFanCard extends LitElement {
     const parts: string[] = [];
     if (c.show_background === false) {
       parts.push(`--duux-bg:transparent`);
+    } else if (c.background) {
+      parts.push(`--duux-bg:${c.background}`);
+    }
+    if (c.show_box_shadow === false) {
       parts.push(`--duux-shadow-card:none`);
     } else {
-      if (c.background) parts.push(`--duux-bg:${c.background}`);
       parts.push(`--duux-shadow-card:var(--ha-card-box-shadow, 0 2px 6px rgba(0,0,0,.2))`);
     }
     if (c.accent_color) parts.push(`--duux-accent:${c.accent_color}`);
