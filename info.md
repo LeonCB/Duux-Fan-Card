@@ -12,7 +12,7 @@ A full-featured custom Lovelace card for **Duux / Whisper Flex** fans in Home As
 - **Horizontal oscillation** toggle (`fan.oscillate`).
 - **Vertical oscillation** toggle (the separate `switch.*_vertical_oscillation` entity).
 - **Timer** dropdown (From 1 to 12 hours) on the same row as the oscillation toggles.
-- **Optional background & shadow** — toggle the card background (`show_background`) and drop shadow (`show_box_shadow`) independently; both on by default.
+- **Optional background, shadow & border** — toggle the card background (`show_background`), drop shadow (`show_box_shadow`) and border (`show_border`) independently.
 - **Theme-aware text shadow** — both the name and the status text use `var(--entity-text-shadow, none)`, so they automatically pick up a theme's entity text-shadow variable (e.g. `blue_metal_dark`) with a clean fallback (no shadow) elsewhere.
 - **Visual editor** Toggle the options you need.
 
@@ -61,6 +61,7 @@ The visual editor exposes the entity, name, icon, and the show/hide toggles belo
 | `show_timer` | boolean | `true` | |
 | `show_background` | boolean | `true` | Card background color. `false` = transparent |
 | `show_box_shadow` | boolean | `true` | Card drop shadow. `false` = no shadow |
+| `show_border` | boolean | `false` | Card border. `true` = shows a 1px border |
 
 ### Styling options (YAML only)
 
@@ -76,6 +77,7 @@ Not shown in the GUI editor, but fully supported in YAML:
 | `border_radius` | `16px` | Corner radius |
 | `font_weight` | `500` | Text weight |
 | `text_shadow` | `0 1px 2px rgba(0,0,0,.6)` | CSS text-shadow on chips/buttons (the name and status text instead follow the theme's `--entity-text-shadow`) |
+| `border_color` | `#4da3ff` | Border color/CSS value, used only when `show_border` is `true` (default: theme divider color) |
 
 ### Full example
 

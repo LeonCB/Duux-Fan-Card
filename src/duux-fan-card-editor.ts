@@ -20,6 +20,7 @@ const SCHEMA = [
       { name: "show_timer", selector: { boolean: {} } },
       { name: "show_background", selector: { boolean: {} } },
       { name: "show_box_shadow", selector: { boolean: {} } },
+      { name: "show_border", selector: { boolean: {} } },
     ],
   },
 ];
@@ -37,6 +38,7 @@ const LABELS: Record<string, string> = {
   show_timer: "Toon timer",
   show_background: "Toon achtergrond",
   show_box_shadow: "Toon schaduw",
+  show_border: "Toon rand",
 };
 
 @customElement("duux-fan-card-editor")

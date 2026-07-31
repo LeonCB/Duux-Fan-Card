@@ -370,6 +370,13 @@ export class DuuxFanCard extends LitElement {
     } else {
       parts.push(`--duux-shadow-card:var(--ha-card-box-shadow, 0 2px 6px rgba(0,0,0,.2))`);
     }
+    if (c.show_border) {
+      parts.push(
+        `--duux-border:1px solid ${c.border_color ?? "var(--divider-color, rgba(127,127,127,0.3))"}`
+      );
+    } else {
+      parts.push(`--duux-border:none`);
+    }
     if (c.accent_color) parts.push(`--duux-accent:${c.accent_color}`);
     if (c.text_color) parts.push(`--duux-text:${c.text_color}`);
     if (c.secondary_text_color) parts.push(`--duux-text2:${c.secondary_text_color}`);
@@ -391,6 +398,7 @@ export class DuuxFanCard extends LitElement {
       --duux-weight: 500;
       --duux-shadow: none;
       --duux-shadow-card: var(--ha-card-box-shadow, 0 2px 6px rgba(0, 0, 0, 0.2));
+      --duux-border: none;
     }
     ha-card {
       background: var(--duux-bg);
@@ -399,6 +407,7 @@ export class DuuxFanCard extends LitElement {
       color: var(--duux-text);
       overflow: hidden;
       box-shadow: var(--duux-shadow-card);
+      border: var(--duux-border);
     }
     .header {
       display: flex;
