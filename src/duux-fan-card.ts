@@ -458,12 +458,13 @@ export class DuuxFanCard extends LitElement {
     }
     .title {
       font-weight: var(--duux-weight);
-      font-size: 1.05rem;
+      font-size: var(--ha-font-size-m);
       color: var(--duux-text);
       text-shadow: var(--entity-text-shadow, none);
     }
     .subtitle {
-      font-size: 0.85rem;
+      font-size: var(--ha-font-size-s);
+      font-family: var(--primary-font-family);
       color: var(--duux-text2);
       text-shadow: var(--entity-text-shadow, none);
     }
@@ -524,7 +525,8 @@ export class DuuxFanCard extends LitElement {
       border-radius: 999px;
       background: rgba(127, 127, 127, 0.14);
       color: var(--primary-text-color, var(--duux-text));
-      font-size: 0.85rem;
+      font-size: var(--ha-font-size-s);
+      font-family: var(--primary-font-family);
       font-weight: var(--duux-weight);
       text-shadow: var(--duux-shadow);
       transition: background 0.2s, color 0.2s;
@@ -561,7 +563,8 @@ export class DuuxFanCard extends LitElement {
       border: 1px solid rgba(127, 127, 127, 0.3);
       background: rgba(127, 127, 127, 0.08);
       color: var(--primary-text-color, var(--duux-text));
-      font-size: 0.85rem;
+      font-size: var(--ha-font-size-s);
+      font-family: var(--primary-font-family);
       font-weight: var(--duux-weight);
       text-align: center;
       text-align-last: center;
