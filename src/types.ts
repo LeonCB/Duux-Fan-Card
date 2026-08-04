@@ -10,7 +10,7 @@ export const DEFAULT_DUUX_FAN_CARD_CONFIG: Partial<DuuxFanCardConfig> = {
   show_timer: true,
   show_background: true,
   show_box_shadow: true,
-  show_border: false,
+  show_border: true,
 };
 
 export interface DuuxFanCardConfig extends LovelaceCardConfig {

@@ -562,6 +562,7 @@ export class DuuxFanCard extends LitElement {
       background: rgba(127, 127, 127, 0.08);
       color: var(--primary-text-color, var(--duux-text));
       font-size: 0.85rem;
+      font-weight: var(--duux-weight);
       text-align: center;
       text-align-last: center;
     }

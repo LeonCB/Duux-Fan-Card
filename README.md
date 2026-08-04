@@ -61,7 +61,7 @@ The visual editor exposes the entity, name, icon, and the show/hide toggles belo
 | `show_timer` | boolean | `true` | |
 | `show_background` | boolean | `true` | Card background color. `false` = transparent |
 | `show_box_shadow` | boolean | `true` | Card drop shadow. `false` = no shadow |
-| `show_border` | boolean | `false` | Card border. `true` = shows a 1px border |
+| `show_border` | boolean | `true` | Card border. `false` = no border |
 
 ### Styling options (YAML only)
 
