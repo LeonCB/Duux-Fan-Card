@@ -2,7 +2,7 @@
 
 A full-featured custom Lovelace card for **Duux / Whisper Flex** fans in Home Assistant. Exposes every capability of the fan in one card: power, speed, preset modes, horizontal and vertical oscillation, and the sleep timer.
 
-![version](https://img.shields.io/badge/version-1.0.0-blue)
+![versie](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FLeonCB%2FDuux-Fan-Card%2Freleases%2Flatest&query=%24.tag_name&label=versie&color=blue)
 
 ## Features
 
