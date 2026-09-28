@@ -138,7 +138,13 @@ export class DuuxFanCard extends LitElement {
   };
 
   private _setSpeed = (e: Event): void => {
-    const pct = Number((e.target as HTMLInputElement).value);
+    const input = e.target as HTMLInputElement;
+    const speeds = Number(input.max);
+    const speed = Number(input.value);
+    // Convert fan speed back to a whole percentage. Rounding down (with a tiny
+    // tolerance for float noise) keeps every speed inside its own band, so
+    // HA maps it back to exactly this speed: 1 -> 3%, 13 -> 50%, 26 -> 100%.
+    const pct = Math.min(100, Math.floor((speed * 100) / speeds + 1e-9));
     this.hass.callService("fan", "set_percentage", {
       entity_id: this._config.entity,
       percentage: pct,
@@ -265,6 +271,11 @@ export class DuuxFanCard extends LitElement {
   }
 
   private _renderSpeed(pct: number, step: number, isOn: boolean): TemplateResult {
+    // The slider works in whole fan speeds (0..n) instead of percentages, so the
+    // top speed is always reachable (a fractional step like 3.846… can make the
+    // browser stop one step short of 100%).
+    const speeds = Math.max(1, Math.round(100 / step));
+    const speed = Math.round((pct * speeds) / 100);
     return html`
       <div class="row speed-row">
         <ha-icon icon="mdi:speedometer-slow"></ha-icon>
@@ -274,9 +285,9 @@ export class DuuxFanCard extends LitElement {
           id="duux-speed-${this._config.entity}"
           name="duux-speed-${this._config.entity}"
           min="0"
-          max="100"
-          step=${step}
-          .value=${String(pct)}
+          max=${speeds}
+          step="1"
+          .value=${String(speed)}
           ?disabled=${!isOn}
           @change=${this._setSpeed}
         />
