@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code ophalen
+        uses: actions/checkout@v4
+
+      - name: Node.js installeren
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Versie uit de tag in de code zetten
+        run: sed -i "s/const CARD_VERSION = \".*\"/const CARD_VERSION = \"$GITHUB_REF_NAME\"/" src/duux-fan-card.ts
+
+      - name: Afhankelijkheden installeren
+        run: npm ci
+
+      - name: Bouwen
+        run: npm run build
+
+      - name: JS-bestand aan de release hangen
+        run: gh release upload "$GITHUB_REF_NAME" dist/duux-fan-card.js --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
