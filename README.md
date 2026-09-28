@@ -7,13 +7,14 @@ A full-featured custom Lovelace card for **Duux / Whisper Flex** fans in Home As
 ## Features
 
 - **Power** toggle — a round icon button with an animated spinning fan icon (speed-scaled) while on.
-- **Speed slider** — Continuous 0–100%, maps to the fan's native steps.
+- **Speed slider** — snaps to the fan's own speed steps (`percentage_step`), so every position is a real fan speed.
 - **Preset modes** — Normaal / Natuurlijk / Slaap .
 - **Horizontal oscillation** toggle (`fan.oscillate`).
 - **Vertical oscillation** toggle (the separate `switch.*_vertical_oscillation` entity).
 - **Timer** dropdown (From 1 to 12 hours) on the same row as the oscillation toggles.
 - **Optional background, shadow & border** — toggle the card background (`show_background`), drop shadow (`show_box_shadow`) and border (`show_border`) independently.
 - **Theme-aware text shadow** — both the name and the status text use `var(--entity-text-shadow, none)`, so they automatically pick up a theme's entity text-shadow variable (e.g. `blue_metal_dark`) with a clean fallback (no shadow) elsewhere.
+- **Unavailable state** — when the fan is offline, the status reads "Niet beschikbaar" and all controls are disabled.
 - **Visual editor** Toggle the options you need.
 
 ## Installation (HACS — custom repository)

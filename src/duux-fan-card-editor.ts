@@ -1,6 +1,6 @@
 import { LitElement, html, css, TemplateResult, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, fireEvent, LovelaceCardEditor } from "custom-card-helpers";
+import { HomeAssistant, fireEvent, LovelaceCardEditor } from "./ha";
 import { DuuxFanCardConfig, DEFAULT_DUUX_FAN_CARD_CONFIG } from "./types";
 
 const SCHEMA = [

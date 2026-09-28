@@ -1,6 +1,6 @@
 import { LitElement, html, css, PropertyValues, TemplateResult, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, fireEvent } from "custom-card-helpers";
+import { HomeAssistant, fireEvent } from "./ha";
 import { DuuxFanCardConfig, DEFAULT_DUUX_FAN_CARD_CONFIG } from "./types";
 import "./duux-fan-card-editor";
 
@@ -18,9 +18,9 @@ console.info(
 (window as any).customCards.push({
   type: "duux-fan-card",
   name: "Duux Fan Card",
-  description: "Full-featured control card for Duux / Whisper Flex fans",
+  description: "Volledige bediening voor Duux / Whisper Flex ventilatoren",
   preview: true,
-  documentationURL: "https://github.com/yourname/duux-fan-card",
+  documentationURL: "https://github.com/LeonCB/Duux-Fan-Card",
 });
 
 const PRESET_ICONS: Record<string, string> = {
@@ -75,7 +75,7 @@ export class DuuxFanCard extends LitElement {
 
   public setConfig(config: DuuxFanCardConfig): void {
     if (!config.entity || !config.entity.startsWith("fan.")) {
-      throw new Error("You must specify a fan entity");
+      throw new Error("Kies een ventilator-entiteit (fan.…)");
     }
     this._config = {
       ...DEFAULT_DUUX_FAN_CARD_CONFIG,
@@ -85,6 +85,15 @@ export class DuuxFanCard extends LitElement {
 
   public getCardSize(): number {
     return 4;
+  }
+
+  // Default size in sections views (12-column grid, rows of ~56px)
+  public getGridOptions() {
+    return {
+      columns: 12,
+      rows: "auto",
+      min_columns: 6,
+    };
   }
 
   protected shouldUpdate(changedProps: PropertyValues): boolean {
@@ -173,13 +182,15 @@ export class DuuxFanCard extends LitElement {
     const stateObj = this.hass.states[this._config.entity];
     if (!stateObj) {
       return html`<ha-card
-        ><div class="warning">Entity ${this._config.entity} not found</div></ha-card
+        ><div class="warning">Entiteit ${this._config.entity} niet gevonden</div></ha-card
       >`;
     }
 
+    const unavailable = stateObj.state === "unavailable" || stateObj.state === "unknown";
     const isOn = stateObj.state === "on";
     const attrs = stateObj.attributes;
     const pct: number = attrs.percentage ?? 0;
+    const pctStep: number = attrs.percentage_step ?? 1;
     const presetModes: string[] = attrs.preset_modes ?? [];
     const currentPreset: string | undefined = attrs.preset_mode;
     const oscillating: boolean = !!attrs.oscillating;
@@ -202,7 +213,7 @@ export class DuuxFanCard extends LitElement {
     return html`
       <ha-card style=${this._cardStyle()}>
         <div class="container">
-          ${this._renderHeader(name, isOn, pct)}
+          ${this._renderHeader(name, isOn, pct, pctStep, unavailable)}
 
           <div class="controls">
             ${this._config.show_presets && presetModes.length
@@ -215,12 +226,20 @@ export class DuuxFanCard extends LitElement {
     `;
   }
 
-  private _renderHeader(name: string, isOn: boolean, pct: number): TemplateResult {
+  private _renderHeader(
+    name: string,
+    isOn: boolean,
+    pct: number,
+    pctStep: number,
+    unavailable: boolean
+  ): TemplateResult {
     const icon = this._config.icon ?? "mdi:fan";
+    const status = unavailable ? "Niet beschikbaar" : isOn ? `${Math.round(pct)}%` : "Uit";
     return html`
       <div class="header">
         <button
           class="power-icon ${isOn ? "on" : "off"}"
+          ?disabled=${unavailable}
           @click=${this._togglePower}
           title="Aan/uit"
         >
@@ -235,26 +254,28 @@ export class DuuxFanCard extends LitElement {
             ? html`<div class="name" @click=${() => this._moreInfo(this._config.entity)}>
                 ${this._config.show_name ? html`<span class="title">${name}</span>` : nothing}
                 ${this._config.show_percentage
-                  ? html`<span class="subtitle">${isOn ? `${Math.round(pct)}%` : "Uit"}</span>`
+                  ? html`<span class="subtitle">${status}</span>`
                   : nothing}
               </div>`
             : nothing}
-          ${this._config.show_speed ? this._renderSpeed(pct, isOn) : nothing}
+          ${this._config.show_speed ? this._renderSpeed(pct, pctStep, isOn) : nothing}
         </div>
       </div>
     `;
   }
 
-  private _renderSpeed(pct: number, isOn: boolean): TemplateResult {
+  private _renderSpeed(pct: number, step: number, isOn: boolean): TemplateResult {
     return html`
       <div class="row speed-row">
         <ha-icon icon="mdi:speedometer-slow"></ha-icon>
         <input
           class="slider"
           type="range"
+          id="duux-speed-${this._config.entity}"
+          name="duux-speed-${this._config.entity}"
           min="0"
           max="100"
-          step="1"
+          step=${step}
           .value=${String(pct)}
           ?disabled=${!isOn}
           @change=${this._setSpeed}
@@ -327,6 +348,8 @@ export class DuuxFanCard extends LitElement {
         ${showTimer
           ? html`<select
               class="timer-select even"
+              id="duux-timer-${this._config.entity}"
+              name="duux-timer-${this._config.entity}"
               ?disabled=${!isOn}
               @change=${(e: Event) =>
                 this._setTimer(timerEnt!, (e.target as HTMLSelectElement).value)}
@@ -435,6 +458,10 @@ export class DuuxFanCard extends LitElement {
       transition: background 0.25s, color 0.25s;
       color: var(--duux-icon);
     }
+    .power-icon:disabled {
+      cursor: not-allowed;
+      color: var(--disabled-text-color, rgba(127, 127, 127, 0.6));
+    }
     .power-icon.on {
       background: color-mix(in srgb, var(--duux-accent) 22%, transparent);
       color: var(--duux-accent);
@@ -524,7 +551,7 @@ export class DuuxFanCard extends LitElement {
       padding: 8px 12px;
       border-radius: 999px;
       background: rgba(127, 127, 127, 0.14);
-      color: var(--primary-text-color, var(--duux-text));
+      color: var(--duux-text);
       font-size: var(--ha-font-size-s);
       font-family: var(--primary-font-family);
       font-weight: var(--duux-weight);
@@ -562,7 +589,7 @@ export class DuuxFanCard extends LitElement {
       border-radius: 999px;
       border: 1px solid rgba(127, 127, 127, 0.3);
       background: rgba(127, 127, 127, 0.08);
-      color: var(--primary-text-color, var(--duux-text));
+      color: var(--duux-text);
       font-size: var(--ha-font-size-s);
       font-family: var(--primary-font-family);
       font-weight: var(--duux-weight);

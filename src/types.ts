@@ -1,4 +1,4 @@
-import { LovelaceCardConfig } from "custom-card-helpers";
+import { LovelaceCardConfig } from "./ha";
 
 export const DEFAULT_DUUX_FAN_CARD_CONFIG: Partial<DuuxFanCardConfig> = {
   show_name: true,
