@@ -8,7 +8,8 @@ A full-featured custom Lovelace card for **Duux / Whisper Flex** fans in Home As
 
 - **Power** toggle — a round icon button with an animated spinning fan icon (speed-scaled) while on.
 - **Speed slider** — snaps to the fan's own speed steps (`percentage_step`), so every position is a real fan speed.
-- **Preset modes** — Normaal / Natuurlijk / Slaap .
+- **Preset modes** — Normaal / Natuurlijk / Slaap. While the fan is off, a tap on a preset turns the fan on directly in that mode.
+- **Readable off state** — while the fan is off, the controls use a muted but readable color (`--duux-off`, default: the theme's secondary text color) instead of the theme's disabled grey.
 - **Horizontal oscillation** toggle (`fan.oscillate`).
 - **Vertical oscillation** toggle (the separate `switch.*_vertical_oscillation` entity).
 - **Timer** dropdown (From 1 to 12 hours) on the same row as the oscillation toggles.
@@ -75,6 +76,7 @@ Not shown in the GUI editor, but fully supported in YAML:
 | `text_color` | `#ffffff` | Primary text |
 | `secondary_text_color` | `#9b9b9b` | Secondary text |
 | `icon_color` | `#9b9b9b` | Resting icon color |
+| `off_color` | `#8e959e` | Text/icon color of the controls while the fan is off (default: `secondary_text_color`, i.e. the theme's secondary text color) |
 | `border_radius` | `16px` | Corner radius |
 | `font_weight` | `500` | Text weight |
 | `text_shadow` | `0 1px 2px rgba(0,0,0,.6)` | CSS text-shadow on chips/buttons (the name and status text instead follow the theme's `--entity-text-shadow`) |

@@ -44,6 +44,7 @@ export interface DuuxFanCardConfig extends LovelaceCardConfig {
   text_color?: string;             // primary text color
   secondary_text_color?: string;
   icon_color?: string;             // resting icon color
+  off_color?: string;              // text/icon color of the controls while the fan is off
   border_radius?: string;          // e.g. "16px"
   font_weight?: string;            // e.g. "500"
   text_shadow?: string;            // e.g. "0 1px 2px rgba(0,0,0,.6)"

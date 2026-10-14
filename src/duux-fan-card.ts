@@ -151,7 +151,16 @@ export class DuuxFanCard extends LitElement {
     });
   };
 
-  private _setPreset(mode: string): void {
+  private _setPreset(mode: string, isOn: boolean): void {
+    // When the fan is off, a preset click turns it on directly in that mode
+    // (fan.turn_on accepts preset_mode), so one tap is enough.
+    if (!isOn) {
+      this.hass.callService("fan", "turn_on", {
+        entity_id: this._config.entity,
+        preset_mode: mode,
+      });
+      return;
+    }
     this.hass.callService("fan", "set_preset_mode", {
       entity_id: this._config.entity,
       preset_mode: mode,
@@ -223,7 +232,7 @@ export class DuuxFanCard extends LitElement {
 
           <div class="controls">
             ${this._config.show_presets && presetModes.length
-              ? this._renderPresets(presetModes, currentPreset, isOn)
+              ? this._renderPresets(presetModes, currentPreset, isOn, unavailable)
               : nothing}
             ${this._renderSecondRow(oscillating, vEnt, vOn, timerEnt, timerState, timerOptions, isOn)}
           </div>
@@ -299,16 +308,20 @@ export class DuuxFanCard extends LitElement {
   private _renderPresets(
     modes: string[],
     current: string | undefined,
-    isOn: boolean
+    isOn: boolean,
+    unavailable: boolean
   ): TemplateResult {
+    // Presets stay clickable while the fan is off (a click turns it on in that
+    // mode); they are only disabled when the fan is unavailable.
     return html`
       <div class="row presets even" style="grid-template-columns: repeat(${modes.length}, 1fr)">
         ${modes.map(
           (m) => html`
             <button
-              class="chip even ${current === m && isOn ? "active" : ""}"
-              ?disabled=${!isOn}
-              @click=${() => this._setPreset(m)}
+              class="chip even ${current === m && isOn ? "active" : ""} ${isOn ? "" : "off"}"
+              ?disabled=${unavailable}
+              title=${isOn ? this._presetLabel(m) : `Aanzetten in ${this._presetLabel(m)}`}
+              @click=${() => this._setPreset(m, isOn)}
             >
               <ha-icon icon=${PRESET_ICONS[m] ?? "mdi:fan"}></ha-icon>
               <span>${this._presetLabel(m)}</span>
@@ -415,6 +428,7 @@ export class DuuxFanCard extends LitElement {
     if (c.text_color) parts.push(`--duux-text:${c.text_color}`);
     if (c.secondary_text_color) parts.push(`--duux-text2:${c.secondary_text_color}`);
     if (c.icon_color) parts.push(`--duux-icon:${c.icon_color}`);
+    if (c.off_color) parts.push(`--duux-off:${c.off_color}`);
     if (c.border_radius) parts.push(`--duux-radius:${c.border_radius}`);
     if (c.font_weight) parts.push(`--duux-weight:${c.font_weight}`);
     if (c.text_shadow) parts.push(`--duux-shadow:${c.text_shadow}`);
@@ -428,6 +442,8 @@ export class DuuxFanCard extends LitElement {
       --duux-text: var(--primary-text-color, #fff);
       --duux-text2: var(--secondary-text-color, #9b9b9b);
       --duux-icon: var(--state-icon-color, #9b9b9b);
+      /* Controls while the fan is off: muted but readable (not disabled-grey) */
+      --duux-off: var(--duux-text2);
       --duux-radius: var(--ha-card-border-radius, 16px);
       --duux-weight: 500;
       --duux-shadow: none;
@@ -573,9 +589,17 @@ export class DuuxFanCard extends LitElement {
     .chip ha-icon {
       --mdc-icon-size: 18px;
     }
+    /* Fan off: presets stay clickable, toggles are disabled; both use the
+       muted-but-readable off color instead of the theme's disabled grey. */
+    .chip.off,
+    .chip:disabled {
+      color: var(--duux-off);
+    }
     .chip:disabled {
       cursor: not-allowed;
-      color: var(--disabled-text-color, rgba(127, 127, 127, 0.6));
+    }
+    .chip.off:not(:disabled):hover {
+      color: var(--duux-text);
     }
     .chip.active {
       background: var(--duux-accent);
@@ -609,8 +633,11 @@ export class DuuxFanCard extends LitElement {
     }
     .timer-select:disabled {
       cursor: not-allowed;
-      color: var(--disabled-text-color, rgba(127, 127, 127, 0.6));
-      -webkit-text-fill-color: var(--disabled-text-color, rgba(127, 127, 127, 0.6));
+      /* Browsers add their own opacity (Chrome: 0.7) to a disabled select,
+         which would dim the off color a second time. */
+      opacity: 1;
+      color: var(--duux-off);
+      -webkit-text-fill-color: var(--duux-off);
     }
     .warning {
       padding: 12px;
