@@ -1,14 +1,26 @@
-﻿# Duux Fan Card
+# Duux Fan Card
 
 A full-featured custom Lovelace card for **Duux / Whisper Flex** fans in Home Assistant. Exposes every capability of the fan in one card: power, speed, preset modes, horizontal and vertical oscillation, and the sleep timer.
 
 ![versie](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FLeonCB%2FDuux-Fan-Card%2Freleases%2Flatest&query=%24.tag_name&label=versie&color=blue)
+![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2025.5%2B-41BDF5?logo=homeassistant&logoColor=white)
+![license](https://img.shields.io/badge/license-MIT-green)
+
+<!-- ha-marketplace:exclude-start -->
+[![Open your Home Assistant instance and open this repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=LeonCB&repository=Duux-Fan-Card&category=plugin)
+<!-- ha-marketplace:exclude-end -->
+
+## Requirements
+
+- **Home Assistant 2025.5 or newer.** The card uses Home Assistant's typography variables (`--ha-font-size-m`, `--ha-font-size-s`), which were introduced in 2025.5. On older versions the card still works, but the text falls back to the inherited font size.
+- A `fan` entity for your Duux fan. Tested with the **Duux Whisper Flex** through the [Tuya Local](https://github.com/make-all/tuya-local) integration.
 
 ## Features
 
 - **Power** toggle — a round icon button with an animated spinning fan icon (speed-scaled) while on.
 - **Speed slider** — snaps to the fan's own speed steps (`percentage_step`), so every position is a real fan speed.
-- **Preset modes** — Normaal / Natuurlijk / Slaap .
+- **Preset modes** — Normaal / Natuurlijk / Slaap. While the fan is off, a tap on a preset turns the fan on directly in that mode.
+- **Readable off state** — while the fan is off, the controls use a muted but readable color (`--duux-off`, default: the theme's secondary text color) instead of the theme's disabled grey.
 - **Horizontal oscillation** toggle (`fan.oscillate`).
 - **Vertical oscillation** toggle (the separate `switch.*_vertical_oscillation` entity).
 - **Timer** dropdown (From 1 to 12 hours) on the same row as the oscillation toggles.
@@ -17,19 +29,39 @@ A full-featured custom Lovelace card for **Duux / Whisper Flex** fans in Home As
 - **Unavailable state** — when the fan is offline, the status reads "Niet beschikbaar" and all controls are disabled.
 - **Visual editor** Toggle the options you need.
 
-## Installation (HACS — custom repository)
+<!-- ha-marketplace:exclude-start -->
+## Installation
 
-1. In HACS go to **⋮ → Custom repositories**.
-2. Add `https://github.com/LeonCB/Duux-Fan-Card` with category **Lovelace** (Dashboard).
+### Marketplace (Home Assistant 2026.11 and newer)
+
+Click the **Open in Marketplace** button at the top of this page and confirm to add the repository. Then install **Duux Fan Card** and reload your browser.
+
+Or add it by hand:
+
+1. Go to **Settings → Marketplace** and select **Add from link** in the upper-right corner.
+2. Enter `LeonCB/Duux-Fan-Card` and select **Add**. If asked for the type, choose **Dashboard**.
 3. Install **Duux Fan Card** and reload your browser.
 
-The resource is registered automatically by HACS. For YAML-mode dashboards add:
+The Marketplace may ask you to connect GitHub before you can add a repository.
+
+### HACS (Home Assistant 2025.5 – 2026.10)
+
+1. In HACS go to **⋮ → Custom repositories**.
+2. Add `https://github.com/LeonCB/Duux-Fan-Card` with type **Dashboard**.
+3. Install **Duux Fan Card** and reload your browser.
+
+### Dashboard resource
+
+The Marketplace and HACS register the resource automatically. For YAML-mode dashboards add:
 
 ```yaml
 resources:
-  - url: /hacsfiles/Duux-Fan-Card/duux-fan-card.js
+  - url: /local/community/Duux-Fan-Card/duux-fan-card.js
     type: module
 ```
+
+The older path `/hacsfiles/Duux-Fan-Card/duux-fan-card.js` keeps working.
+<!-- ha-marketplace:exclude-end -->
 
 ## Configuration
 
@@ -75,6 +107,7 @@ Not shown in the GUI editor, but fully supported in YAML:
 | `text_color` | `#ffffff` | Primary text |
 | `secondary_text_color` | `#9b9b9b` | Secondary text |
 | `icon_color` | `#9b9b9b` | Resting icon color |
+| `off_color` | `#8e959e` | Text/icon color of the controls while the fan is off (default: `secondary_text_color`, i.e. the theme's secondary text color) |
 | `border_radius` | `16px` | Corner radius |
 | `font_weight` | `500` | Text weight |
 | `text_shadow` | `0 1px 2px rgba(0,0,0,.6)` | CSS text-shadow on chips/buttons (the name and status text instead follow the theme's `--entity-text-shadow`) |
@@ -94,4 +127,4 @@ border_radius: 18px
 
 ## License
 
-MIT
+Released under the [MIT License](LICENSE).

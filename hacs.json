@@ -2,5 +2,6 @@
   "name": "Duux Fan Card",
   "render_readme": true,
   "filename": "duux-fan-card.js",
-  "hide_default_branch": true
+  "hide_default_branch": true,
+  "homeassistant": "2025.5.0"
 }
