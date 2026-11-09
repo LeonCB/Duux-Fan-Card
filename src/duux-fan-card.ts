@@ -1,7 +1,13 @@
 import { LitElement, html, css, PropertyValues, TemplateResult, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant, fireEvent } from "./ha";
-import { DuuxFanCardConfig, DEFAULT_DUUX_FAN_CARD_CONFIG } from "./types";
+import {
+  DuuxFanCardConfig,
+  DEFAULT_DUUX_FAN_CARD_CONFIG,
+  COLOR_OPTIONS,
+  HA_DEFAULT_COLORS,
+  colorMode,
+} from "./types";
 import "./duux-fan-card-editor";
 
 const CARD_VERSION = "1.0.0";
@@ -407,29 +413,35 @@ export class DuuxFanCard extends LitElement {
   private _cardStyle(): string {
     const c = this._config;
     const parts: string[] = [];
+    const mode = colorMode(c);
+
+    // Colors, per color mode (see COLOR_OPTIONS in types.ts)
+    if (mode === "default") {
+      // Plain Home Assistant theme colors; ignores --duux-fan-card-* theme variables
+      for (const [key, cssVar] of Object.entries(COLOR_OPTIONS)) {
+        parts.push(`${cssVar}:${HA_DEFAULT_COLORS[key]}`);
+      }
+    } else if (mode === "manual") {
+      for (const [key, cssVar] of Object.entries(COLOR_OPTIONS)) {
+        const value = c[key];
+        if (value) parts.push(`${cssVar}:${value}`);
+      }
+    }
+    const borderColor =
+      mode === "default"
+        ? HA_DEFAULT_COLORS.border_color
+        : (mode === "manual" && c.border_color) ||
+          "var(--duux-fan-card-border-color, var(--divider-color, rgba(127,127,127,0.3)))";
+
+    // Switches win over any color (pushed later in the same inline style)
     if (c.show_background === false) {
       parts.push(`--duux-bg:transparent`);
-    } else if (c.background) {
-      parts.push(`--duux-bg:${c.background}`);
     }
     if (c.show_box_shadow === false) {
       parts.push(`--duux-shadow-card:none`);
     }
-    if (c.show_border) {
-      parts.push(
-        `--duux-border:1px solid ${
-          c.border_color ??
-          "var(--duux-fan-card-border-color, var(--divider-color, rgba(127,127,127,0.3)))"
-        }`
-      );
-    } else {
-      parts.push(`--duux-border:none`);
-    }
-    if (c.accent_color) parts.push(`--duux-accent:${c.accent_color}`);
-    if (c.text_color) parts.push(`--duux-text:${c.text_color}`);
-    if (c.secondary_text_color) parts.push(`--duux-text2:${c.secondary_text_color}`);
-    if (c.icon_color) parts.push(`--duux-icon:${c.icon_color}`);
-    if (c.off_color) parts.push(`--duux-off:${c.off_color}`);
+    parts.push(c.show_border ? `--duux-border:1px solid ${borderColor}` : `--duux-border:none`);
+
     if (c.border_radius) parts.push(`--duux-radius:${c.border_radius}`);
     if (c.font_weight) parts.push(`--duux-weight:${c.font_weight}`);
     if (c.text_shadow) parts.push(`--duux-shadow:${c.text_shadow}`);

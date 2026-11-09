@@ -76,7 +76,7 @@ All companion entities are auto-detected from the fan's entity id. Override only
 
 ### Editor (GUI)
 
-The visual editor exposes the entity, name, icon, and the show/hide toggles below. It does **not** expose color/shadow/radius styling — those remain available as YAML-only options (see below) since most users don't need them.
+The visual editor exposes the entity, name, icon, the show/hide toggles below and the color mode (**Kleuren**). With **Handmatig** a set of color pickers appears. Radius, font weight and text shadow remain YAML-only options (see below).
 
 | Option | Type | Default | Description |
 |---|---|---|---|
@@ -95,10 +95,21 @@ The visual editor exposes the entity, name, icon, and the show/hide toggles belo
 | `show_background` | boolean | `true` | Card background color. `false` = transparent |
 | `show_box_shadow` | boolean | `true` | Card drop shadow. `false` = no shadow |
 | `show_border` | boolean | `true` | Card border. `false` = no border |
+| `color_mode` | string | see below | `default`, `theme` or `manual` — see [Color mode](#color-mode) |
 
-### Styling options (YAML only)
+### Color mode
 
-Not shown in the GUI editor, but fully supported in YAML:
+| `color_mode` | Editor | Colors come from |
+|---|---|---|
+| `default` | Standaard | Home Assistant's own theme colors (`--primary-color`, `--primary-text-color`, …). `--duux-fan-card-*` theme variables are ignored. |
+| `theme` | Thema | The `--duux-fan-card-*` variables in your theme (see [Theme variables](#theme-variables)), falling back to the Home Assistant colors. |
+| `manual` | Handmatig | The color options on the card (`accent_color`, `background`, `text_color`, `secondary_text_color`, `icon_color`, `off_color`, `border_color`). A color you leave out follows the theme. |
+
+Without `color_mode` the card behaves as before: `manual` when any color option is set, otherwise `theme`. Switching to **Standaard** or **Thema** in the editor removes the manual colors from the config. The editor's color pickers save hex values; in YAML any CSS color works (`rgba()`, `var(--…)`), and the editor keeps such a value unless you pick a new color.
+
+### Styling options
+
+The color options are used with `color_mode: manual` and can be picked in the editor; `border_radius`, `font_weight` and `text_shadow` are YAML-only and always apply:
 
 | Option | Example | Description |
 |---|---|---|
@@ -115,7 +126,7 @@ Not shown in the GUI editor, but fully supported in YAML:
 
 ### Theme variables
 
-Every styling option also has a CSS variable that a theme can set, so the card is styled from the first render without card-mod or UIX (no flash of unstyled content). A YAML option on the card wins over the theme variable; without either, the card follows the regular Home Assistant theme.
+Every styling option also has a CSS variable that a theme can set, so the card is styled from the first render without card-mod or UIX (no flash of unstyled content). They are used with `color_mode: theme` (and, for colors you leave out, with `manual`); `border_radius`, `font_weight` and `text_shadow` follow them in every mode unless the card sets its own value.
 
 | Theme variable | Same as option | Default |
 |---|---|---|
@@ -147,6 +158,7 @@ type: custom:duux-fan-card
 entity: fan.whisper_flex_woonkamer
 name: Woonkamer ventilator
 show_background: false
+color_mode: manual
 accent_color: "#4da3ff"
 font_weight: "600"
 border_radius: 18px
