@@ -113,6 +113,33 @@ Not shown in the GUI editor, but fully supported in YAML:
 | `text_shadow` | `0 1px 2px rgba(0,0,0,.6)` | CSS text-shadow on chips/buttons (the name and status text instead follow the theme's `--entity-text-shadow`) |
 | `border_color` | `#4da3ff` | Border color/CSS value, used only when `show_border` is `true` (default: theme divider color) |
 
+### Theme variables
+
+Every styling option also has a CSS variable that a theme can set, so the card is styled from the first render without card-mod or UIX (no flash of unstyled content). A YAML option on the card wins over the theme variable; without either, the card follows the regular Home Assistant theme.
+
+| Theme variable | Same as option | Default |
+|---|---|---|
+| `duux-fan-card-accent-color` | `accent_color` | `var(--primary-color)` |
+| `duux-fan-card-background` | `background` | `var(--ha-card-background)` |
+| `duux-fan-card-text-color` | `text_color` | `var(--primary-text-color)` |
+| `duux-fan-card-secondary-text-color` | `secondary_text_color` | `var(--secondary-text-color)` |
+| `duux-fan-card-icon-color` | `icon_color` | `var(--state-icon-color)` |
+| `duux-fan-card-off-color` | `off_color` | the secondary text color |
+| `duux-fan-card-border-radius` | `border_radius` | `var(--ha-card-border-radius)` |
+| `duux-fan-card-font-weight` | `font_weight` | `500` |
+| `duux-fan-card-text-shadow` | `text_shadow` | `none` |
+| `duux-fan-card-box-shadow` | — | `var(--ha-card-box-shadow)` |
+| `duux-fan-card-border-color` | `border_color` | `var(--divider-color)` |
+
+`show_background: false`, `show_box_shadow: false` and `show_border: false` still switch the background, shadow and border off, whatever the theme sets.
+
+```yaml
+# in your theme
+my_theme:
+  duux-fan-card-accent-color: "#4da3ff"
+  duux-fan-card-font-weight: "600"
+```
+
 ### Full example
 
 ```yaml

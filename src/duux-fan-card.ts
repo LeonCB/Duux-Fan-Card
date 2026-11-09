@@ -414,12 +414,13 @@ export class DuuxFanCard extends LitElement {
     }
     if (c.show_box_shadow === false) {
       parts.push(`--duux-shadow-card:none`);
-    } else {
-      parts.push(`--duux-shadow-card:var(--ha-card-box-shadow, 0 2px 6px rgba(0,0,0,.2))`);
     }
     if (c.show_border) {
       parts.push(
-        `--duux-border:1px solid ${c.border_color ?? "var(--divider-color, rgba(127,127,127,0.3))"}`
+        `--duux-border:1px solid ${
+          c.border_color ??
+          "var(--duux-fan-card-border-color, var(--divider-color, rgba(127,127,127,0.3)))"
+        }`
       );
     } else {
       parts.push(`--duux-border:none`);
@@ -436,18 +437,30 @@ export class DuuxFanCard extends LitElement {
   }
 
   static styles = css`
+    /* Order of precedence: YAML styling option (set inline on ha-card)
+       > theme variable --duux-fan-card-* > Home Assistant theme default.
+       The --duux-* names are internal; themes set the --duux-fan-card-* ones. */
     :host {
-      --duux-accent: var(--primary-color, #0a84ff);
-      --duux-bg: var(--ha-card-background, var(--card-background-color, #1c1c1e));
-      --duux-text: var(--primary-text-color, #fff);
-      --duux-text2: var(--secondary-text-color, #9b9b9b);
-      --duux-icon: var(--state-icon-color, #9b9b9b);
+      --duux-accent: var(--duux-fan-card-accent-color, var(--primary-color, #0a84ff));
+      --duux-bg: var(
+        --duux-fan-card-background,
+        var(--ha-card-background, var(--card-background-color, #1c1c1e))
+      );
+      --duux-text: var(--duux-fan-card-text-color, var(--primary-text-color, #fff));
+      --duux-text2: var(
+        --duux-fan-card-secondary-text-color,
+        var(--secondary-text-color, #9b9b9b)
+      );
+      --duux-icon: var(--duux-fan-card-icon-color, var(--state-icon-color, #9b9b9b));
       /* Controls while the fan is off: muted but readable (not disabled-grey) */
-      --duux-off: var(--duux-text2);
-      --duux-radius: var(--ha-card-border-radius, 16px);
-      --duux-weight: 500;
-      --duux-shadow: none;
-      --duux-shadow-card: var(--ha-card-box-shadow, 0 2px 6px rgba(0, 0, 0, 0.2));
+      --duux-off: var(--duux-fan-card-off-color, var(--duux-text2));
+      --duux-radius: var(--duux-fan-card-border-radius, var(--ha-card-border-radius, 16px));
+      --duux-weight: var(--duux-fan-card-font-weight, 500);
+      --duux-shadow: var(--duux-fan-card-text-shadow, none);
+      --duux-shadow-card: var(
+        --duux-fan-card-box-shadow,
+        var(--ha-card-box-shadow, 0 2px 6px rgba(0, 0, 0, 0.2))
+      );
       --duux-border: none;
     }
     ha-card {
