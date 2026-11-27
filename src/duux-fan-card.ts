@@ -1,6 +1,6 @@
 import { LitElement, html, css, PropertyValues, TemplateResult, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, fireEvent } from "./ha";
+import { HassEntity, HomeAssistant, fireEvent } from "./ha";
 import {
   DuuxFanCardConfig,
   DEFAULT_DUUX_FAN_CARD_CONFIG,
@@ -69,11 +69,10 @@ export class DuuxFanCard extends LitElement {
   public static getStubConfig(hass: HomeAssistant): DuuxFanCardConfig {
     const fan = Object.keys(hass.states).find((e) => e.startsWith("fan."));
     const entityId = fan || "fan.whisper_flex_woonkamer";
-    const stateObj = hass.states[entityId];
+    // No name: the card shows the name Home Assistant composes
     return {
       type: "custom:duux-fan-card",
       entity: entityId,
-      name: stateObj?.attributes.friendly_name ?? "Ventilator",
       icon: "mdi:fan",
       ...DEFAULT_DUUX_FAN_CARD_CONFIG,
     } as DuuxFanCardConfig;
@@ -112,6 +111,15 @@ export class DuuxFanCard extends LitElement {
     if (oldHass.states[this._config.entity] !== this.hass.states[this._config.entity]) {
       return true;
     }
+    // A renamed device, entity, area or floor changes the composed name
+    if (
+      oldHass.entities !== this.hass.entities ||
+      oldHass.devices !== this.hass.devices ||
+      oldHass.areas !== this.hass.areas ||
+      oldHass.floors !== this.hass.floors
+    ) {
+      return true;
+    }
     // Also refresh on changes to companion entities (timer, vertical oscillation)
     const vEnt = this._companion(
       "vertical_oscillation",
@@ -123,6 +131,19 @@ export class DuuxFanCard extends LitElement {
       if (ent && oldHass.states[ent] !== this.hass.states[ent]) return true;
     }
     return false;
+  }
+
+  // The card's title. From Home Assistant 2025.10 the frontend composes it
+  // from area, device and entity, exactly like the built-in cards. The
+  // friendly_name attribute is planned for deprecation (HA 2026.11), so it is
+  // only the fallback for older versions.
+  private _computeName(stateObj: HassEntity): string {
+    const name = this._config.name === "" ? undefined : this._config.name;
+    if (this.hass.formatEntityName) {
+      return this.hass.formatEntityName(stateObj, name);
+    }
+    if (typeof name === "string") return name;
+    return stateObj.attributes.friendly_name ?? stateObj.entity_id;
   }
 
   /* ---------- entity resolution helpers ---------- */
@@ -215,8 +236,7 @@ export class DuuxFanCard extends LitElement {
     const presetModes: string[] = attrs.preset_modes ?? [];
     const currentPreset: string | undefined = attrs.preset_mode;
     const oscillating: boolean = !!attrs.oscillating;
-    const name =
-      this._config.name ?? attrs.friendly_name ?? this._config.entity;
+    const name = this._computeName(stateObj);
 
     const vEnt = this._companion(
       "vertical_oscillation",

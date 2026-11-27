@@ -1,4 +1,4 @@
-import { LovelaceCardConfig } from "./ha";
+import { EntityName, LovelaceCardConfig } from "./ha";
 
 export const DEFAULT_DUUX_FAN_CARD_CONFIG: Partial<DuuxFanCardConfig> = {
   show_name: true,
@@ -53,7 +53,9 @@ export interface DuuxFanCardConfig extends LovelaceCardConfig {
   timer_entity?: string;             // select.<base>_timer
   vertical_oscillation_entity?: string; // switch.<base>_vertical_oscillation
 
-  name?: string;
+  // Empty = the name Home Assistant composes (device + entity), like the
+  // built-in cards. Fixed text, or name parts from the name picker.
+  name?: EntityName;
   icon?: string;
 
   // Feature toggles

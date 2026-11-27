@@ -1,6 +1,6 @@
 import { LitElement, html, css, TemplateResult, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, fireEvent, LovelaceCardEditor } from "./ha";
+import { HomeAssistant, fireEvent, haAtLeast, LovelaceCardEditor } from "./ha";
 import {
   DuuxFanCardConfig,
   DEFAULT_DUUX_FAN_CARD_CONFIG,
@@ -8,9 +8,20 @@ import {
   colorMode,
 } from "./types";
 
-const BASE_SCHEMA = [
+// Home Assistant 2025.11 and newer: the name picker of the built-in cards
+// (fixed text, or parts like area, device and entity)
+const NAME_PICKER = {
+  name: "name",
+  selector: { entity_name: {} },
+  context: { entity: "entity" },
+};
+
+// Older versions: plain text; empty shows the fan's friendly name
+const NAME_TEXT = { name: "name", selector: { text: {} } };
+
+const baseSchema = (namePicker: boolean) => [
   { name: "entity", required: true, selector: { entity: { domain: "fan" } } },
-  { name: "name", selector: { text: {} } },
+  namePicker ? NAME_PICKER : NAME_TEXT,
   { name: "icon", selector: { icon: {} } },
   {
     type: "grid",
@@ -84,6 +95,7 @@ const LABELS: Record<string, string> = {
 };
 
 const HELPERS: Record<string, string> = {
+  name_text: "Leeg laten voor de naam van de ventilator.",
   color_mode:
     "Standaard volgt de kleuren van je Home Assistant-thema. Thema gebruikt ook de --duux-fan-card-* variabelen uit je thema. Handmatig gebruikt de kleuren die je hieronder kiest; een kleur die je niet kiest, volgt het thema.",
 };
@@ -142,22 +154,35 @@ export class DuuxFanCardEditor extends LitElement implements LovelaceCardEditor 
     LABELS[s.name] ?? s.name;
 
   private _computeHelper = (s: { name: string }): string | undefined =>
-    HELPERS[s.name];
+    s.name === "name"
+      ? this._namePicker
+        ? undefined
+        : HELPERS.name_text
+      : HELPERS[s.name];
+
+  // The name picker exists from Home Assistant 2025.11
+  private get _namePicker(): boolean {
+    return haAtLeast(this.hass, 2025, 11);
+  }
 
   private get _schema() {
-    return colorMode(this._config) === "manual"
-      ? [...BASE_SCHEMA, COLOR_SCHEMA]
-      : BASE_SCHEMA;
+    const base = baseSchema(this._namePicker);
+    return colorMode(this._config) === "manual" ? [...base, COLOR_SCHEMA] : base;
   }
 
   private _valueChanged(ev: CustomEvent): void {
     const value = ev.detail.value as Record<string, any>;
     const newConfig: DuuxFanCardConfig = { ...value } as DuuxFanCardConfig;
 
-    if (newConfig.entity && newConfig.entity !== this._config.entity) {
-      const stateObj = this.hass?.states[newConfig.entity];
-      if (stateObj?.attributes.friendly_name) {
-        newConfig.name = stateObj.attributes.friendly_name;
+    // No name: the card shows the name Home Assistant composes, which follows
+    // renames. It is not filled in, so it never goes stale in the YAML.
+    if (newConfig.name === undefined || newConfig.name === "") {
+      delete newConfig.name;
+      // Name parts set on a newer Home Assistant, which the text field
+      // (before 2025.11) cannot show: keep them
+      const own = this._config.name;
+      if (!this._namePicker && own !== undefined && typeof own !== "string") {
+        newConfig.name = own;
       }
     }
 
@@ -188,10 +213,11 @@ export class DuuxFanCardEditor extends LitElement implements LovelaceCardEditor 
   }
 
   private get _displayData(): Record<string, any> {
-    const stateObj = this.hass?.states[this._config.entity];
+    const name = this._config.name;
     const data: Record<string, any> = {
       ...this._config,
-      name: this._config.name ?? stateObj?.attributes.friendly_name ?? "",
+      // The text field (before 2025.11) can only show fixed text
+      name: this._namePicker ? name : typeof name === "string" ? name : "",
       icon: this._config.icon ?? "mdi:fan",
       color_mode: colorMode(this._config),
     };

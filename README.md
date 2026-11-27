@@ -14,9 +14,11 @@ A full-featured custom Lovelace card for **Duux / Whisper Flex** fans in Home As
 
 - **Home Assistant 2025.5 or newer.** The card uses Home Assistant's typography variables (`--ha-font-size-m`, `--ha-font-size-s`), which were introduced in 2025.5. On older versions the card still works, but the text falls back to the inherited font size.
 - A `fan` entity for your Duux fan. Tested with the **Duux Whisper Flex** through the [Tuya Local](https://github.com/make-all/tuya-local) integration.
+- The card name follows Home Assistant's entity naming from **2025.10** and offers the built-in name picker in the editor from **2025.11**. On older versions it falls back to the fan's friendly name and a plain text field.
 
 ## Features
 
+- **Home Assistant naming** — without a name of its own, the card shows the name Home Assistant composes from the device and entity, exactly like the built-in cards (Home Assistant 2026.11 naming). Rename the device and the card follows. In the editor you can pick which parts to show (area, device, entity, …) or type a fixed name. The `friendly_name` attribute, which Home Assistant plans to deprecate, is only used on versions before 2025.10.
 - **Power** toggle — a round icon button with an animated spinning fan icon (speed-scaled) while on.
 - **Speed slider** — snaps to the fan's own speed steps (`percentage_step`), so every position is a real fan speed.
 - **Preset modes** — Normaal / Natuurlijk / Slaap. While the fan is off, a tap on a preset turns the fan on directly in that mode.
@@ -83,7 +85,7 @@ The visual editor exposes the entity, name, icon, the show/hide toggles below an
 | `entity` | string | **required** | The `fan.*` entity |
 | `timer_entity` | string | auto | `select.*_timer` |
 | `vertical_oscillation_entity` | string | auto | `switch.*_vertical_oscillation` |
-| `name` | string | entity's friendly name | Card title (auto-filled in the editor) |
+| `name` | string or name parts | Home Assistant's name (device + entity) | Card title. Leave empty to follow Home Assistant's naming. Fixed text, or parts from the name picker, e.g. `[{type: area}]` |
 | `icon` | string | `mdi:fan` | Power icon (auto-filled in the editor) |
 | `show_name` | boolean | `true` | Name text, shown above the speed slider (icon stays always visible) |
 | `show_percentage` | boolean | `true` | Status text ("xx%"/"Uit"), shown above the speed slider |
@@ -162,6 +164,17 @@ color_mode: manual
 accent_color: "#4da3ff"
 font_weight: "600"
 border_radius: 18px
+```
+
+### Name from parts
+
+Pick the parts in the editor's name picker, or write them in YAML. This shows only the area, e.g. "Woonkamer":
+
+```yaml
+type: custom:duux-fan-card
+entity: fan.whisper_flex_woonkamer
+name:
+  - type: area
 ```
 
 ## License
